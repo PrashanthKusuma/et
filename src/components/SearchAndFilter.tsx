@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +34,7 @@ export function SearchAndFilter({ expenses, onFilterChange }: SearchAndFilterPro
   const [sortOption, setSortOption] = useState<SortOption>('date-desc');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const isMobile = useIsMobile();
-
+  
   const form = useForm<z.infer<typeof searchSchema>>({
     resolver: zodResolver(searchSchema),
     defaultValues: { query: '' },
@@ -85,21 +85,32 @@ export function SearchAndFilter({ expenses, onFilterChange }: SearchAndFilterPro
     form.reset({ query: '' });
     setDateRange(undefined);
     setSortOption('date-desc');
-    onFilterChange(expenses); // Revert to original full list, sorted by default
+    // We call onFilterChange with a sorted version of the original expenses.
+    // The original sorting logic for all expenses was just a default sort.
+    const defaultSortedExpenses = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    onFilterChange(defaultSortedExpenses);
     if(isMobile) {
       setIsSheetOpen(false);
     }
   };
+
+  // Automatically apply filters on desktop when any filter value changes
+  useEffect(() => {
+    if (isMobile === false) { // explicit check for false to avoid running on initial undefined
+      applyFiltersAndSort();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, dateRange, sortOption, isMobile, expenses]);
   
   const isFilterActive = searchQuery !== '' || dateRange?.from || dateRange?.to || sortOption !== 'date-desc';
   
-  const mobileFilterControls = (
-    <div className="space-y-4">
-      <div className="relative">
+  const filterControls = (
+    <>
+      <div className={cn("relative", isMobile ? 'w-full' : 'flex-grow')}>
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
             placeholder="Search..."
-            className="pl-10"
+            className="pl-10 w-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -112,6 +123,7 @@ export function SearchAndFilter({ expenses, onFilterChange }: SearchAndFilterPro
                   variant={"outline"}
                   className={cn(
                       "w-full justify-start text-left font-normal",
+                      !isMobile && "w-[260px]",
                       !dateRange && "text-muted-foreground"
                   )}
               >
@@ -134,24 +146,28 @@ export function SearchAndFilter({ expenses, onFilterChange }: SearchAndFilterPro
                   defaultMonth={dateRange?.from}
                   selected={dateRange}
                   onSelect={setDateRange}
-                  numberOfMonths={1}
+                  numberOfMonths={isMobile ? 1 : 2}
               />
           </PopoverContent>
       </Popover>
 
       <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-          <SelectTrigger>
+          <SelectTrigger className={cn(!isMobile && 'w-[180px]')}>
               <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
-              <SelectItem value="date-desc">Date: Newest first</SelectItem>
-              <SelectItem value="date-asc">Date: Oldest first</SelectItem>
-              <SelectItem value="amount-desc">Amount: High to Low</SelectItem>
-              <SelectItem value="amount-asc">Amount: Low to High</SelectItem>
+              <SelectItem value="date-desc">Date: Newest</SelectItem>
+              <SelectItem value="date-asc">Date: Oldest</SelectItem>
+              <SelectItem value="amount-desc">Amount: High-Low</SelectItem>
+              <SelectItem value="amount-asc">Amount: Low-High</SelectItem>
           </SelectContent>
       </Select>
-    </div>
+    </>
   );
+
+  if (isMobile === undefined) {
+    return <div className="h-[58px] animate-pulse rounded-lg border bg-muted" />; // Or some other placeholder
+  }
 
   if (isMobile) {
     return (
@@ -168,7 +184,9 @@ export function SearchAndFilter({ expenses, onFilterChange }: SearchAndFilterPro
             <SheetTitle>Filter & Sort</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-6">
-            {mobileFilterControls}
+            <div className="space-y-4">
+              {filterControls}
+            </div>
             <div className="flex flex-col gap-2">
                 <Button onClick={applyFiltersAndSort}>Apply Filters</Button>
                 {isFilterActive && (
@@ -183,72 +201,13 @@ export function SearchAndFilter({ expenses, onFilterChange }: SearchAndFilterPro
 
   return (
     <div className="flex items-center gap-2 rounded-lg border p-2">
-      <div className="relative flex-grow">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-            placeholder="Search..."
-            className="pl-10 w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      
-      <Popover>
-          <PopoverTrigger asChild>
-              <Button
-                  id="date"
-                  variant={"outline"}
-                  className={cn(
-                      "w-[260px] justify-start text-left font-normal",
-                      !dateRange && "text-muted-foreground"
-                  )}
-              >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateRange?.from ? (
-                      dateRange.to ? (
-                          <>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>
-                      ) : (
-                          format(dateRange.from, "LLL dd, y")
-                      )
-                  ) : (
-                      <span>Pick a date range</span>
-                  )}
-              </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                  initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                  numberOfMonths={2}
-              />
-          </PopoverContent>
-      </Popover>
-
-      <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-          <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-              <SelectItem value="date-desc">Date: Newest</SelectItem>
-              <SelectItem value="date-asc">Date: Oldest</SelectItem>
-              <SelectItem value="amount-desc">Amount: High-Low</SelectItem>
-              <SelectItem value="amount-asc">Amount: Low-High</SelectItem>
-          </SelectContent>
-      </Select>
-      
+      {filterControls}
       {isFilterActive && (
-        <Button variant="ghost" onClick={resetFilters} size="sm">
-            <X className="mr-2 h-4 w-4" />
-            Clear
+        <Button variant="ghost" onClick={resetFilters} size="icon" className="h-9 w-9">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Clear filters</span>
         </Button>
       )}
-       <Button onClick={applyFiltersAndSort} size="sm">
-          <SlidersHorizontal className="mr-2 h-4 w-4" />
-          Apply
-      </Button>
     </div>
   );
 }

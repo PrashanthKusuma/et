@@ -48,37 +48,39 @@ export default function CategoryDetailView({ category, expenses: initialExpenses
     <>
       <div className="min-h-screen bg-background">
         <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-14 items-center justify-between">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="sr-only">Back</span>
-              </Link>
-            </Button>
-            <h1 className="font-headline text-lg font-bold truncate">{category.name}</h1>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => setEditBudgetOpen(true)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  <span>Edit Budget</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setMergeCategoryOpen(true)}>
-                  <Merge className="mr-2 h-4 w-4" />
-                  <span>Merge/Move</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setDeleteCategoryOpen(true)} className="text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span>Delete Category</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
+          <div className="container flex h-14 items-center">
+            <div className="flex-none">
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="sr-only">Back</span>
+                </Link>
+              </Button>
+            </div>
+            <h1 className="flex-1 text-center font-headline text-lg font-bold truncate px-4">{category.name}</h1>
+            <div className="flex-none">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setEditBudgetOpen(true)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    <span>Edit Budget</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setMergeCategoryOpen(true)}>
+                    <Merge className="mr-2 h-4 w-4" />
+                    <span>Merge/Move</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setDeleteCategoryOpen(true)} className="text-destructive">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <span>Delete Category</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </header>
 

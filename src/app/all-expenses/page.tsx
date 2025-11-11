@@ -6,15 +6,20 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Expense } from '@/lib/types';
 import { SearchAndFilter } from '@/components/SearchAndFilter';
 
 export default function AllExpensesPage() {
   const { state, loading } = useAppContext();
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[] | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated || loading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <p>Loading...</p>
@@ -28,15 +33,17 @@ export default function AllExpensesPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Back</span>
-            </Link>
-          </Button>
-          <h1 className="font-headline text-lg font-bold">All Expenses</h1>
-          <div className="w-9 h-9" />
+        <div className="container flex h-14 items-center">
+          <div className="flex-none w-10">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">Back</span>
+              </Link>
+            </Button>
+          </div>
+          <h1 className="flex-1 text-center font-headline text-lg font-bold truncate">All Expenses</h1>
+          <div className="w-10 h-9 flex-none" />
         </div>
       </header>
       <main className="container mx-auto p-4 md:p-6 space-y-6">
