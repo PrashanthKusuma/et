@@ -1,7 +1,7 @@
 'use client';
 
 import type { Expense } from '@/lib/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Trash2, Edit, Move, MoreVertical } from 'lucide-react';
 import { Button } from './ui/button';
@@ -24,6 +24,12 @@ export function ExpenseItem({ expense, showCategory = false }: ExpenseItemProps)
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [isEditOpen, setEditOpen] = useState(false);
   const [isMoveOpen, setMoveOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   const isMobile = useIsMobile();
 
   const category = showCategory ? state.categories.find(c => c.id === expense.categoryId) : null;
@@ -74,22 +80,30 @@ export function ExpenseItem({ expense, showCategory = false }: ExpenseItemProps)
     </DropdownMenu>
   );
 
+  if (!hydrated) {
+    return <div className="h-[74px] rounded-lg border bg-card animate-pulse" />;
+  }
+
   return (
     <>
-      <div className="flex items-center gap-4 rounded-lg border p-3 hover:bg-secondary/50">
-        <div className="flex-grow min-w-0">
+      <div className="flex flex-col gap-2 rounded-lg border p-3 hover:bg-secondary/50">
+        {/* Row 1: Title & Category */}
+        <div className="flex items-center justify-between gap-4">
           <p className="font-semibold truncate">{expense.description || "Uncategorized"}</p>
-          <div className="flex items-center gap-2 flex-wrap text-sm text-muted-foreground mt-1">
-            <span>{format(new Date(expense.date), 'MMM d, yyyy')}</span>
-            {category && (
-              <Badge style={{ backgroundColor: category.color, color: getCategoryTextColor(category.color) }} className="truncate">
-                {category.name}
-              </Badge>
-            )}
-            <span className="flex-grow"></span> {/* Spacer */}
-            <p className="font-semibold text-base text-foreground ml-auto mr-2">{formatCurrency(expense.amount)}</p>
-            {isMobile ? actionMenu : actionButtons}
-          </div>
+          {category && (
+            <Badge style={{ backgroundColor: category.color, color: getCategoryTextColor(category.color) }} className="truncate flex-shrink-0">
+              {category.name}
+            </Badge>
+          )}
+        </div>
+        
+        {/* Row 2: Date, Amount & Actions */}
+        <div className="flex items-center justify-between gap-4">
+            <span className="text-sm text-muted-foreground flex-shrink-0">{format(new Date(expense.date), 'MMM d, yyyy')}</span>
+            <div className="flex items-center gap-2">
+                <p className="font-semibold text-base text-foreground flex-shrink-0">{formatCurrency(expense.amount)}</p>
+                {isMobile ? actionMenu : actionButtons}
+            </div>
         </div>
       </div>
       <DeleteDialog
