@@ -19,6 +19,9 @@ export default function AllExpensesPage() {
     setHydrated(true);
   }, []);
 
+  // Use original expenses from context for filtering, and filteredExpenses for display
+  const expensesToDisplay = useMemo(() => filteredExpenses ?? state.expenses.slice().sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()), [filteredExpenses, state.expenses]);
+
   if (!hydrated || loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -27,9 +30,6 @@ export default function AllExpensesPage() {
     );
   }
   
-  // Use original expenses from context for filtering, and filteredExpenses for display
-  const expensesToDisplay = useMemo(() => filteredExpenses ?? state.expenses.slice().sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()), [filteredExpenses, state.expenses]);
-
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

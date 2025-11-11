@@ -1,7 +1,7 @@
 'use client';
 
 import type { Category, Expense } from '@/lib/types';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Edit, PlusCircle, Trash2, Merge, MoreVertical } from 'lucide-react';
@@ -34,7 +34,7 @@ export default function CategoryDetailView({ category, expenses: initialExpenses
   
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[] | null>(null);
 
-  const expenses = filteredExpenses ?? initialExpenses;
+  const expenses = useMemo(() => filteredExpenses ?? initialExpenses, [filteredExpenses, initialExpenses]);
   
   const spentAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   const progress = category.budget > 0 ? (spentAmount / category.budget) * 100 : 0;
