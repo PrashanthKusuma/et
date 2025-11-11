@@ -9,6 +9,7 @@ import { ExpenseDistributionChart } from './ExpenseDistributionChart';
 import { MonthlyTrendChart } from './MonthlyTrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { DailySpendingChart } from './DailySpendingChart';
 
 export default function Dashboard() {
   const { state, loading } = useAppContext();
@@ -29,7 +30,7 @@ export default function Dashboard() {
     );
   }
 
-  const { categories, expenses } = state;
+  const { categories } = state;
 
   return (
     <div className="min-h-screen w-full bg-background">
@@ -45,7 +46,7 @@ export default function Dashboard() {
             </TabsList>
             <TabsContent value="categories">
                 <div className="mt-6">
-                    <h2 className="text-2xl font-bold font-headline mb-4">Expense Categories</h2>
+                    <h2 className="text-xl font-bold font-headline mb-4">Expense Categories</h2>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {categories.map(category => (
                         <CategoryCard key={category.id} category={category} />
@@ -59,23 +60,26 @@ export default function Dashboard() {
                 </div>
             </TabsContent>
             <TabsContent value="analytics">
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mt-6">
+                <div className="grid gap-6 mt-6">
+                  <DailySpendingChart />
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
                     <Card className="lg:col-span-2">
-                    <CardHeader>
-                        <CardTitle>Expense Distribution</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ExpenseDistributionChart />
-                    </CardContent>
+                      <CardHeader>
+                          <CardTitle>Expense Distribution</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <ExpenseDistributionChart />
+                      </CardContent>
                     </Card>
                     <Card className="lg:col-span-3">
-                    <CardHeader>
-                        <CardTitle>Monthly Spending Trend</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <MonthlyTrendChart />
-                    </CardContent>
+                      <CardHeader>
+                          <CardTitle>Monthly Spending Trend</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <MonthlyTrendChart />
+                      </CardContent>
                     </Card>
+                  </div>
                 </div>
             </TabsContent>
           </Tabs>

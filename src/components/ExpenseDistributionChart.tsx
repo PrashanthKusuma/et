@@ -3,8 +3,7 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAppContext } from '@/context/AppContext';
 import { useMemo } from 'react';
-import { getCategoryTextColor } from '@/lib/utils';
-import { Card, CardContent } from './ui/card';
+import { CHART_COLORS } from '@/lib/constants';
 
 export function ExpenseDistributionChart() {
   const { state } = useAppContext();
@@ -13,7 +12,7 @@ export function ExpenseDistributionChart() {
   const chartData = useMemo(() => {
     if (categories.length === 0 || expenses.length === 0) return [];
     
-    const categorySpending = categories.map(category => {
+    const categorySpending = categories.map((category, index) => {
       const total = expenses
         .filter(expense => expense.categoryId === category.id)
         .reduce((sum, expense) => sum + expense.amount, 0);
@@ -21,9 +20,9 @@ export function ExpenseDistributionChart() {
       return {
         name: category.name,
         value: total,
-        color: category.color,
+        color: CHART_COLORS[index % CHART_COLORS.length],
       };
-    }).filter(item => item.value > 0); // Only include categories with spending
+    }).filter(item => item.value > 0);
 
     return categorySpending;
   }, [expenses, categories]);

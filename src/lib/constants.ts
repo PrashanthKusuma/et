@@ -25,3 +25,17 @@ export const CATEGORY_TEXT_COLORS = [
   'hsl(221, 70%, 45%)', // Geekblue text
   'hsl(265, 55%, 45%)', // Purple text
 ];
+
+export const CHART_COLORS = [
+  'hsl(221, 83%, 53%)',
+  'hsl(16, 83%, 53%)',
+  'hsl(45, 83%, 53%)',
+  'hsl(135, 53%, 53%)',
+  'hsl(265, 83%, 63%)',
+  'hsl(326, 83%, 53%)',
+  'hsl(82, 73%, 53%)',
+  'hsl(180, 73%, 53%)',
+  'hsl(0, 83%, 63%)',
+  'hsl(211, 63%, 53%)',
+  'hsl(33, 83%, 53%)',
+];

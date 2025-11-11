@@ -33,9 +33,6 @@ export function CategoryCard({ category }: CategoryCardProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="font-headline text-lg">{category.name}</CardTitle>
-            <Badge style={{ backgroundColor: category.color, color: textColor }} className="font-semibold">
-              {category.name}
-            </Badge>
           </div>
           <CardDescription>Budget: {formatCurrency(budget)}</CardDescription>
         </CardHeader>

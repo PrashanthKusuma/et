@@ -9,18 +9,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState, useMemo, useEffect } from 'react';
 import type { Expense } from '@/lib/types';
 import { SearchAndFilter } from '@/components/SearchAndFilter';
+import { formatCurrency } from '@/lib/utils';
 
 export default function AllExpensesPage() {
   const { state, loading } = useAppContext();
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[] | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
+  const expensesToDisplay = useMemo(() => filteredExpenses ?? state.expenses.slice().sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()), [filteredExpenses, state.expenses]);
+  
+  const totalFilteredAmount = useMemo(() => {
+    return expensesToDisplay.reduce((sum, expense) => sum + expense.amount, 0);
+  }, [expensesToDisplay]);
+
+
   useEffect(() => {
     setHydrated(true);
   }, []);
-
-  // Use original expenses from context for filtering, and filteredExpenses for display
-  const expensesToDisplay = useMemo(() => filteredExpenses ?? state.expenses.slice().sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()), [filteredExpenses, state.expenses]);
 
   if (!hydrated || loading) {
     return (
@@ -48,8 +53,9 @@ export default function AllExpensesPage() {
       </header>
       <main className="container mx-auto p-4 md:p-6 space-y-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>All Expenses List</CardTitle>
+            <div className="text-2xl font-bold text-primary">{formatCurrency(totalFilteredAmount)}</div>
           </CardHeader>
           <CardContent>
             <SearchAndFilter expenses={state.expenses} onFilterChange={setFilteredExpenses} />

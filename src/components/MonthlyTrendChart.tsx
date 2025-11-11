@@ -42,13 +42,28 @@ export function MonthlyTrendChart() {
         </div>
     );
   }
+  
+  const compactFormatter = new Intl.NumberFormat('en-IN', {
+    notation: 'compact',
+    compactDisplay: 'short',
+    currency: 'INR',
+    style: 'currency',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  });
 
   return (
     <div style={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
             <BarChart data={chartData}>
                 <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
-                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrency(value as number)}/>
+                <YAxis 
+                  stroke="#888888" 
+                  fontSize={12} 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tickFormatter={(value) => compactFormatter.format(value as number)}
+                />
                 <Tooltip 
                     cursor={{fill: 'hsl(var(--secondary))', radius: 'var(--radius)'}}
                     formatter={(value: number) => [formatCurrency(value), "Spending"]}
